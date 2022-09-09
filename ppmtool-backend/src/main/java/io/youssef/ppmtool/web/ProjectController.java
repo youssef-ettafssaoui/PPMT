@@ -7,10 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -24,10 +30,16 @@ public class ProjectController {
     // return a response entity of type project.
     // BindingResult = an interface that basically invokes the validator on an object?
     @PostMapping("")
-    public ResponseEntity<?> createNewProject(@RequestBody Project project, BindingResult result) {
+    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result) {
 
         if(result.hasErrors()) {
-            return new ResponseEntity<String>("Invalid Project Object !", HttpStatus.BAD_REQUEST);
+            Map<String, String> errorMap = new HashMap<>();
+            // extract the field and the message from the error from the field error :
+            for(FieldError error: result.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            // return new ResponseEntity<String>("Invalid Project Object !", HttpStatus.BAD_ REQUEST);
+            return new ResponseEntity<Map<String, String>>(errorMap, HttpStatus.BAD_REQUEST);
         }
         // using ProjectService to save our project in the database
         Project project1 = projectService.saveOrUpdateProject(project);
