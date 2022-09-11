@@ -1,6 +1,9 @@
 img {
   width: 100%;
 }
+.form-group {
+  margin-bottom: 15px;
+}
 
 .navbar {
   background-color: #e3f2fd;
